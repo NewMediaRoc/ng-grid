@@ -21,13 +21,21 @@ Demonstrates the following:
 
       $scope.gridOptions.columnDefs = [
         {name:'id'},
-        {name:'name'},
-        {field:'age'}, // showing backwards compatibility with 2.x.  you can use field in place of name
-        {name: 'address.city'},
-        {name: 'age again', field:'age'}
+        {name:'name', enableCellEdit: true},
+        {field:'age', enableCellEdit: true}, // showing backwards compatibility with 2.x.  you can use field in place of name
+        {name: 'City', field:'address.city', enableCellEdit: true},
+        {name: 'State', field:'address.state', enableCellEdit: true},
+        {name: 'Name2', field:'name', enableCellEdit: true},
+        {name: 'Age2', field:'age', enableCellEdit: true},
+        {name: 'City2', field:'address.city', enableCellEdit: true},
+        {name: 'State2', field:'address.state', enableCellEdit: true},
+        {name: 'Name3', field:'name', enableCellEdit: true},
+        {name: 'Age3', field:'age', enableCellEdit: true},
+        {name: 'City3', field:'address.city', enableCellEdit: true},
+        {name: 'State3', field:'address.state', enableCellEdit: true}
       ];
 
-      $http.get('/data/10000_complex.json')
+      $http.get('/data/50000_complex.json')
         .success(function(data) {
           $scope.gridOptions.data = data;
         });
@@ -43,8 +51,8 @@ Demonstrates the following:
   </file>
   <file name="main.css">
     .grid {
-      width: 500px;
-      height: 450px;
+      width: 1000px;
+      height: 800px;
     }
   </file>
 </example>
