@@ -110,7 +110,7 @@ module.exports = function(grunt) {
       dist: {
         // paths: ['/bower_components/bootstrap'],
         files: {
-          'dist/release/<%= pkg.name %>.css': ['src/less/main.less', 'src/features/*/less/**/*.less'],
+          'dist/release/<%= pkg.name %>.css': ['src/less/main.less', 'src/features/*/less/**/*.less']
         }
       },
       min: {
@@ -148,13 +148,13 @@ module.exports = function(grunt) {
       single: {
         background: false,
         singleRun: true,
-        reporters: ['progress'],
+        reporters: ['progress']
       },
 
       travis: {
         background: false,
         singleRun: true,
-        reporters: ['dots'],
+        reporters: ['dots']
       }
     },
 
@@ -308,7 +308,7 @@ module.exports = function(grunt) {
 
       livereload: {
         options: { livereload: true },
-        files: ['dist/**/*', 'misc/demo/**/*.html', 'docs/**/*'],
+        files: ['dist/**/*', 'misc/demo/**/*.html', 'docs/**/*']
       }
     },
 
@@ -369,7 +369,7 @@ module.exports = function(grunt) {
         scripts: [
           '//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js', // TODO(c0bra): REMOVE!
           '//ajax.googleapis.com/ajax/libs/angularjs/1.2.7/angular.js',
-          '//ajax.googleapis.com/ajax/libs/angularjs/1.2.7/angular-touch.js',
+          '//ajax.googleapis.com/ajax/libs/angularjs/1.2.7/angular-touch.js'
         ],
         hiddenScripts: [
           '//ajax.googleapis.com/ajax/libs/angularjs/1.2.7/angular-animate.js',
@@ -382,7 +382,7 @@ module.exports = function(grunt) {
         ],
         styles: [
           'misc/doc/css/prettify.css',
-          'misc/doc/css/bootstrap-flatly.css',
+          'misc/doc/css/bootstrap-flatly.css'
           // process.env.TRAVIS ? '<%= dist %>/release/<%= pkg.name %>.unstable.css' : '<%= dist %>/release/<%= pkg.name %>.css'
           // '<%= dist %>/release/<%= pkg.name %>.css'
         ],
