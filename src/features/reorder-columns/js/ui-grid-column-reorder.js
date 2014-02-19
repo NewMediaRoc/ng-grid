@@ -153,10 +153,9 @@
           droppedCol = JSON.parse(droppedCol);
           var myIndex = $scope.index;
 
-          $scope.$parent.grid.options.columnDefs.splice(droppedCol.index,1);
-          var simpleColDef = {name:droppedCol.field, index:droppedCol.index};
-          $scope.$parent.grid.options.columnDefs.splice($scope.$index,0,simpleColDef);
-
+//          $scope.$parent.grid.options.columnDefs.splice(droppedCol.index,1);
+//          var simpleColDef = {name:droppedCol.field, index:droppedCol.index};
+//          $scope.$parent.grid.options.columnDefs.splice($scope.$index,0,simpleColDef);
 
           $scope.$parent.grid.renderedColumns.splice(droppedCol.index,1);
           $scope.$parent.grid.renderedColumns.splice($scope.$index,0,droppedCol);
