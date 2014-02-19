@@ -6,9 +6,6 @@
 
   .transform(translateZ(0));
 
-  &.column-resizing {
-  	cursor: pointer;
-  }
 }
 
 .ui-grid-vertical-bar {
@@ -27,6 +24,12 @@
 
 .ui-grid-cell:not(:last-child) .ui-grid-vertical-bar {
   background-color: @verticalBarColor;
+}
+
+.ui-grid-header-cell:last-child .ui-grid-vertical-bar {
+  right: -1px;
+  width: @gridBorderWidth;
+  background-color: @headerVerticalBarColor;
 }
 
 // .ui-grid-vertical-bar-visible {

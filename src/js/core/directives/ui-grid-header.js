@@ -63,6 +63,7 @@
               var canvasWidth = 0;
 
               var ret = '';
+
               uiGridCtrl.grid.columns.forEach(function(column, i) {
                 // ret = ret + ' .grid' + uiGridCtrl.grid.id + ' .col' + i + ' { width: ' + equalWidth + 'px; left: ' + left + 'px; }';
                 //var colWidth = (typeof(c.width) !== 'undefined' && c.width !== undefined) ? c.width : equalWidth;
@@ -87,37 +88,112 @@
                 }
                 else if (angular.isNumber(column.width)) {
                   manualWidthSum = parseInt(manualWidthSum + column.width, 10);
-                  canvasWidth = parseInt(canvasWidth + column.width, 10);
+                  
+                  canvasWidth = parseInt(canvasWidth, 10) + parseInt(column.width, 10);
 
                   column.drawnWidth = column.width;
 
                   ret = ret + ' .grid' + uiGridCtrl.grid.id + ' .col' + column.index + ' { width: ' + column.width + 'px; }';
-
-                  lastColumn = column;
                 }
               });
 
               // Get the remaining width (available width subtracted by the manual widths sum)
               var remainingWidth = availableWidth - manualWidthSum;
 
+              var i, column, colWidth;
+
               if (percentArray.length > 0) {
+                // Pre-process to make sure they're all within any min/max values
+                for (i = 0; i < percentArray.length; i++) {
+                  column = percentArray[i];
+
+                  var percent = parseInt(column.width.replace(/%/g, ''), 10) / 100;
+
+                  colWidth = percent * remainingWidth;
+
+                  if (column.colDef.minWidth && colWidth < column.colDef.minWidth) {
+                    colWidth = column.colDef.minWidth;
+
+                    remainingWidth = remainingWidth - colWidth;
+
+                    canvasWidth += colWidth;
+                    column.drawnWidth = colWidth;
+
+                    ret = ret + ' .grid' + uiGridCtrl.grid.id + ' .col' + column.index + ' { width: ' + colWidth + 'px; }';
+
+                    // Remove this element from the percent array so it's not processed below
+                    percentArray.splice(i, 1);
+                  }
+                  else if (column.colDef.maxWidth && colWidth > column.colDef.maxWidth) {
+                    colWidth = column.colDef.maxWidth;
+
+                    remainingWidth = remainingWidth - colWidth;
+
+                    canvasWidth += colWidth;
+                    column.drawnWidth = colWidth;
+
+                    ret = ret + ' .grid' + uiGridCtrl.grid.id + ' .col' + column.index + ' { width: ' + colWidth + 'px; }';
+
+                    // Remove this element from the percent array so it's not processed below
+                    percentArray.splice(i, 1);
+                  }
+                }
+
                 percentArray.forEach(function(column) {
-                  var percent = parseInt(parseFloat(column.width) / 100, 10);
+                  var percent = parseInt(column.width.replace(/%/g, ''), 10) / 100;
                   var colWidth = percent * remainingWidth;
 
-                  canvasWidth = colWidth;
+                  canvasWidth += colWidth;
 
                   column.drawnWidth = colWidth;
 
                   ret = ret + ' .grid' + uiGridCtrl.grid.id + ' .col' + column.index + ' { width: ' + colWidth + 'px; }';
-
-                  lastColumn = column;
                 });
               }
 
               if (asterisksArray.length > 0) {
-                // Calculate the weight of each asterisk
                 var asteriskVal = parseInt(remainingWidth / asteriskNum, 10);
+
+                 // Pre-process to make sure they're all within any min/max values
+                for (i = 0; i < asterisksArray.length; i++) {
+                  column = asterisksArray[i];
+
+                  colWidth = parseInt(asteriskVal * column.width.length, 10);
+
+                  if (column.colDef.minWidth && colWidth < column.colDef.minWidth) {
+                    colWidth = column.colDef.minWidth;
+
+                    remainingWidth = remainingWidth - colWidth;
+                    asteriskNum--;
+
+                    canvasWidth += colWidth;
+                    column.drawnWidth = colWidth;
+
+                    ret = ret + ' .grid' + uiGridCtrl.grid.id + ' .col' + column.index + ' { width: ' + colWidth + 'px; }';
+
+                    lastColumn = column;
+
+                    // Remove this element from the percent array so it's not processed below
+                    asterisksArray.splice(i, 1);
+                  }
+                  else  if (column.colDef.maxWidth && colWidth > column.colDef.maxWidth) {
+                    colWidth = column.colDef.maxWidth;
+
+                    remainingWidth = remainingWidth - colWidth;
+                    asteriskNum--;
+
+                    canvasWidth += colWidth;
+                    column.drawnWidth = colWidth;
+
+                    ret = ret + ' .grid' + uiGridCtrl.grid.id + ' .col' + column.index + ' { width: ' + colWidth + 'px; }';
+
+                    // Remove this element from the percent array so it's not processed below
+                    asterisksArray.splice(i, 1);
+                  }
+                }
+
+                // Redo the asterisk value, as we may have removed columns due to width constraints
+                asteriskVal = parseInt(remainingWidth / asteriskNum, 10);
 
                 asterisksArray.forEach(function(column) {
                   var colWidth = parseInt(asteriskVal * column.width.length, 10);
@@ -127,24 +203,12 @@
                   column.drawnWidth = colWidth;
 
                   ret = ret + ' .grid' + uiGridCtrl.grid.id + ' .col' + column.index + ' { width: ' + colWidth + 'px; }';
-
-                  lastColumn = column;
                 });
               }
-
-              // // If the total canvas width is less than the viewport width, the final column needs to 
-              // if (canvasWidth < uiGridCtrl.grid.getViewportWidth()) {
-              //   var diff = uiGridCtrl.grid.getViewportWidth() - canvasWidth;
-
-              //   column.width = column.width + diff;
-              //   column.drawnWidth = column.width +;
-              // }
 
               $scope.columnStyles = ret;
 
               uiGridCtrl.grid.canvasWidth = parseInt(canvasWidth, 10);
-
-              // uiGridCtrl.fireScrollingEvent();
             }
 
             if (uiGridCtrl) {

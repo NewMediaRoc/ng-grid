@@ -2,7 +2,7 @@
   'use strict';
 
   // Extend the uiGridHeaderCell directive
-  angular.module('ui.grid').directive('uiGridHeaderCell', ['$log', '$templateCache', '$compile', function ($log, $templateCache, $compile) {
+  angular.module('ui.grid').directive('uiGridHeaderCell', ['$log', '$templateCache', '$compile', '$q', function ($log, $templateCache, $compile, $q) {
     return {
       // Run after the original uiGridHeaderCell
       priority: -10,
@@ -11,34 +11,43 @@
       compile: function() {
         return {
           post: function ($scope, $elm, $attrs, uiGridCtrl) {
-            if (uiGridCtrl.grid.options.enableColumnResizing && $scope.col.colDef.enableColumnResizing !== false) {
+            if (uiGridCtrl.grid.options.enableColumnResizing) {
+              var renderIndexDefer = $q.defer();
+
               $attrs.$observe('renderIndex', function (n, o) {
-                // $log.debug('renderIndex', $scope.$eval(n));
                 $scope.renderIndex = $scope.$eval(n);
+
+                renderIndexDefer.resolve();
               });
 
-              var columnResizerElm = $templateCache.get('ui-grid/columnResizer');
+              renderIndexDefer.promise.then(function() {
+                var columnResizerElm = $templateCache.get('ui-grid/columnResizer');
 
-              var resizerLeft = angular.element(columnResizerElm).clone();
-              var resizerRight = angular.element(columnResizerElm).clone();
+                var resizerLeft = angular.element(columnResizerElm).clone();
+                var resizerRight = angular.element(columnResizerElm).clone();
 
-              resizerLeft.attr('position', 'left');
-              resizerRight.attr('position', 'right');
+                resizerLeft.attr('position', 'left');
+                resizerRight.attr('position', 'right');
 
-              // $log.debug('$scope', $scope);
+                var col = $scope.col;
+                
+                // Get the column to the left of this one
+                var otherCol = uiGridCtrl.grid.renderedColumns[$scope.renderIndex - 1];
 
-              // Don't append the left resizer if this is the first column
-              if ($scope.col.index !== 0) {
-                $elm.prepend(resizerLeft);
-              }
-              
-              // Don't append the right resizer if this is the last column
-              if ($scope.col.index !== $scope.grid.renderedColumns.length - 1) {
-                $elm.append(resizerRight);
-              }
+                // Don't append the left resizer if this is the first column or the column to the left of this one has resizing disabled
+                if ($scope.col.index !== 0 && otherCol.colDef.enableColumnResizing !== false) {
+                  $elm.prepend(resizerLeft);
+                }
+                
+                // Don't append the right resizer if this column has resizing disabled
+                //if ($scope.col.index !== $scope.grid.renderedColumns.length - 1 && $scope.col.colDef.enableColumnResizing !== false) {
+                if ($scope.col.colDef.enableColumnResizing !== false) {
+                  $elm.append(resizerRight);
+                }
 
-              $compile(resizerLeft)($scope);
-              $compile(resizerRight)($scope);
+                $compile(resizerLeft)($scope);
+                $compile(resizerRight)($scope);
+              });
             }
           }
         };
@@ -47,6 +56,10 @@
   }]);
 
   var module = angular.module('ui.grid.resizeColumns', ['ui.grid']);
+
+  module.constant('columnBounds', {
+    minWidth: 35
+  });
   
   /**
    * @ngdoc directive
@@ -88,7 +101,7 @@
      </doc:scenario>
    </doc:example>
    */  
-  module.directive('uiGridColumnResizer', ['$log', '$document', 'gridUtil', 'uiGridConstants', function ($log, $document, gridUtil, uiGridConstants) {
+  module.directive('uiGridColumnResizer', ['$log', '$document', 'gridUtil', 'uiGridConstants', 'columnBounds', function ($log, $document, gridUtil, uiGridConstants, columnBounds) {
     var resizeOverlay = angular.element('<div class="ui-grid-resize-overlay"></div>');
 
     var resizer = {
@@ -137,7 +150,7 @@
                   var args = uiGridCtrl.prevScrollArgs ? uiGridCtrl.prevScrollArgs : { x: { percentage: 0 } };
                     
                   // Add an extra bit of percentage to the scroll event based on the xDiff we were passed
-                  if (xDiff && args.x.pixels) {
+                  if (xDiff && args.x && args.x.pixels) {
                     var extraPercent = xDiff / uiGridCtrl.grid.getViewportWidth();
 
                     args.x.percentage = args.x.percentage - extraPercent;
@@ -157,16 +170,50 @@
           if (event.originalEvent) { event = event.originalEvent; }
           event.preventDefault();
 
-          if (!uiGridCtrl.grid.element.hasClass('column-resizing')) {
-            uiGridCtrl.grid.element.addClass('column-resizing');
-          }
-
           x = event.clientX - gridLeft;
 
           if (x < 0) { x = 0; }
           else if (x > uiGridCtrl.grid.gridWidth) { x = uiGridCtrl.grid.gridWidth; }
 
-          resizeOverlay.css({ left: x });
+          // The other column to resize (the one next to this one)
+          var col = $scope.col;
+          var otherCol;
+          if ($scope.position === 'left') {
+            // Get the column to the left of this one
+            col = uiGridCtrl.grid.renderedColumns[$scope.renderIndex - 1];
+            otherCol = $scope.col;
+          }
+          else if ($scope.position === 'right') {
+            otherCol = uiGridCtrl.grid.renderedColumns[$scope.renderIndex + 1];
+          }
+
+          // Don't resize if it's disabled on this column
+          if (col.colDef.enableColumnResizing === false) {
+            return;
+          }
+
+          if (!uiGridCtrl.grid.element.hasClass('column-resizing')) {
+            uiGridCtrl.grid.element.addClass('column-resizing');
+          }
+
+          // Get the diff along the X axis
+          var xDiff = x - startX;
+
+          // Get the width that this mouse would give the column
+          var newWidth = col.drawnWidth + xDiff;
+
+          // If the new width would be less than the column's allowably minimum width, don't allow it
+          if (col.colDef.minWidth && newWidth < col.colDef.minWidth) {
+            x = x + (col.colDef.minWidth - newWidth);
+          }
+          else if (! col.colDef.minWidth && columnBounds.minWidth && newWidth < columnBounds.minWidth) {
+            x = x + (col.colDef.minWidth - newWidth);
+          }
+          else if (col.colDef.maxWidth && newWidth > col.colDef.maxWidth) {
+            x = x + (col.colDef.maxWidth - newWidth);
+          }
+          
+          resizeOverlay.css({ left: x + 'px' });
         }
 
         function mouseup(event, args) {
@@ -189,21 +236,37 @@
 
           // The other column to resize (the one next to this one)
           var col = $scope.col;
-          var otherCol, multiplier;
+          var otherCol;
           if ($scope.position === 'left') {
             // Get the column to the left of this one
             col = uiGridCtrl.grid.renderedColumns[$scope.renderIndex - 1];
-            // otherCol = uiGridCtrl.grid.renderedColumns[$scope.renderIndex - 1];
             otherCol = $scope.col;
-            // multiplier = 1;
           }
           else if ($scope.position === 'right') {
             otherCol = uiGridCtrl.grid.renderedColumns[$scope.renderIndex + 1];
-            // multiplier = -1;
+          }
+
+          // Don't resize if it's disabled on this column
+          if (col.colDef.enableColumnResizing === false) {
+            return;
+          }
+
+          // Get the new width
+          var newWidth = col.drawnWidth + xDiff;
+
+          // If the new width is less than the minimum width, make it the minimum width
+          if (col.colDef.minWidth && newWidth < col.colDef.minWidth) {
+            newWidth = col.colDef.minWidth;
+          }
+          else if (! col.colDef.minWidth && columnBounds.minWidth && newWidth < columnBounds.minWidth) {
+            newWidth = columnBounds.minWidth;
+          }
+          // 
+          if (col.colDef.maxWidth && newWidth > col.colDef.maxWidth) {
+            newWidth = col.colDef.maxWidth;
           }
           
-          col.colDef.width = col.drawnWidth + xDiff;
-          // otherCol.colDef.width = otherCol.drawnWidth + xDiff * -1;
+          col.colDef.width = newWidth;
 
           // All other columns because fixed to their drawn width, if they aren't already
           resizeAroundColumn(col);
@@ -237,7 +300,6 @@
 
         // On doubleclick, resize to fit all rendered cells
         $elm.on('dblclick', function() {
-          
           var col = $scope.col;
           var otherCol, multiplier;
 
@@ -272,6 +334,18 @@
                 }
               });
             });
+
+          // If the new width is less than the minimum width, make it the minimum width
+          if (col.colDef.minWidth && maxWidth < col.colDef.minWidth) {
+            maxWidth = col.colDef.minWidth;
+          }
+          else if (! col.colDef.minWidth && columnBounds.minWidth && maxWidth < columnBounds.minWidth) {
+            maxWidth = columnBounds.minWidth;
+          }
+          // 
+          if (col.colDef.maxWidth && maxWidth > col.colDef.maxWidth) {
+            maxWidth = col.colDef.maxWidth;
+          }
 
           col.colDef.width = maxWidth;
           
