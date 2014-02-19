@@ -1,25 +1,25 @@
 @import '../../../less/variables';
 
-.ui-grid-column-resizer {
-  top: 0;
-  bottom: 0;
-  width: 5px;
-  position: absolute;
-  cursor: pointer;
-
-  &.left {
-    left: 0;
-  }
-
-  &.right {
-    right: 0;
-  }
+.ui-grid-column-reorder-locked {
+  /*TODO: choose a better default styling for this*/
+  outline:1px solid red;
 }
+.ui-grid-reorder-columns-dragging {
+  /*position:absolute;
+  float: none;
+  bottom: initial;*/
+  font-weight:bold;
+  opacity: .75;
 
-.ui-grid.column-resizing .ui-grid-resize-overlay {
-  position: absolute;
-  top: 0;
-  height: 100%;
-  width: @gridBorderWidth;
-  background-color: darken(@verticalBarColor, 15%);
+  -webkit-filter: invert(100%);
+  filter: invert(100%);
+  cursor:move;
+}
+[ui-grid-column-reorder]{
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }

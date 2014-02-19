@@ -1,20 +1,20 @@
 @ngdoc overview
-@name Tutorial: Column Resizing
+@name Tutorial: Column Reordering
 @description
 
-Resize columns by dragging on the separators.
+Reorder columns by dragging them over another column.
 
 @example
 <example module="app">
   <file name="app.js">
-    var app = angular.module('app', ['ui.grid', 'ui.grid.resize-columns']);
+    var app = angular.module('app', ['ui.grid', 'ui.grid.column-reorder']);
 
     app.controller('MainCtrl', ['$scope', '$http', function ($scope, $http) {
       $scope.gridOptions = {
-        enableColumnResizing: true
+        enableColumnReordering: true
       };
 
-      $http.get('/data/100.json')
+      $http.get('/data/500_complex.json')
         .success(function(data) {
           $scope.gridOptions.data = data;
         });
@@ -22,7 +22,7 @@ Resize columns by dragging on the separators.
   </file>
   <file name="index.html">
     <div ng-controller="MainCtrl">
-      Drag on the column separator to resize; double-click to size according to cell contents.
+      Drag and drop a column header over another column header to reorder.
       <br>
       <br>
       <div ui-grid="gridOptions" class="grid"></div>
@@ -30,8 +30,8 @@ Resize columns by dragging on the separators.
   </file>
   <file name="main.css">
     .grid {
-      width: 500px;
-      height: 400px;
+      width: 660px;
+      height: 500px;
     }
   </file>
 </example>
