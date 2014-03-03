@@ -11,10 +11,20 @@ Reorder columns by dragging them over another column.
 
     app.controller('MainCtrl', ['$scope', '$http', function ($scope, $http) {
       $scope.gridOptions = {
-        enableColumnReordering: true
+        enableColumnReordering: true,
+        columnDefs: []
       };
 
-      $http.get('/data/500_complex.json')
+      var colCount = 1000;
+
+      for (var colIndex = 0; colIndex < colCount; colIndex++) {
+        $scope.gridOptions.columnDefs.push({
+          name: 'col' + colIndex,
+          width: Math.floor(Math.random() * (120 - 50 + 1)) + 50
+        });
+      }
+
+      $http.get('/data/1000_columns.json')
         .success(function(data) {
           $scope.gridOptions.data = data;
         });

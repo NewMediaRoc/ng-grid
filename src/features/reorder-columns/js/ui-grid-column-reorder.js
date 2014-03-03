@@ -11,7 +11,7 @@
         return {
           post: function ($scope, $elm, $attrs, uiGridCtrl) {
             if (uiGridCtrl.grid.options.enableColumnReordering){
-              if($scope.col.colDef.enableColumnReordering === false) {
+              if($scope.col.colDef.reorderable === false) {
                 $elm.addClass('ui-grid-column-reorder-locked');
               } else {
                 $compile(angular.element($elm.children()[1]).attr('ui-grid-column-reorder', '' ))($scope);

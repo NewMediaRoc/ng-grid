@@ -36,44 +36,29 @@ describe('ui.grid.resizeColumns', function () {
     grid = null;
   });
 
-  describe('setting enableColumnResizing', function() {
-    it('should by default cause resizer to be attached to the header elements', function() {
-      var resizers = $(grid).find('[ui-grid-column-resizer]');
+  describe('setting enableColumnReordering to true', function() {
+    describe('and not setting a column reorderable (or setting to true)', function(){
+      xit('should by default cause reorder directive to be attached to the header elements', function() {
+        //var resizers = $(grid).find('[ui-grid-column-resizer]');
 
-      expect(resizers.size()).toEqual(5);
+        //expect(resizers.size()).toEqual(5);
+      });
     });
+    describe('and setting a columnDef reorderable to false',function(){
+      xit('should place the ui-grid-column-reorder-locked class on the column header', function (){
 
-    it('should only attach a right resizer to the first column', function() {
-      var firstColumn = $(grid).find('[ui-grid-header-cell]').first();
-
-      var resizers = $(firstColumn).find('[ui-grid-column-resizer]');
-
-      expect(resizers.size()).toEqual(1);
-
-      expect(resizers.first().attr('position')).toEqual('right');
-      expect(resizers.first().hasClass('right')).toBe(true);
-    });
-
-    xit('should only attach a left resizer to the last column', function() {
-      var firstColumn = $(grid).find('[ui-grid-header-cell]').last();
-
-      var resizers = $(firstColumn).find('[ui-grid-column-resizer]');
-
-      expect(resizers.size()).toEqual(1);
-
-      expect(resizers.first().attr('position')).toEqual('left');
-      expect(resizers.first().hasClass('left')).toBe(true);
+      });
     });
   });
 
   describe('setting enableColumnResizing to false', function() {
-    it('should result in no resizer elements being attached to the column', function() {
-      $scope.gridOpts.enableColumnResizing = false;
-      recompile();
-
-      var resizers = $(grid).find('[ui-grid-column-resizer]');
-
-      expect(resizers.size()).toEqual(0);
+    xit('should not attach the reorder directive to the column headers', function() {
+//      $scope.gridOpts.enableColumnResizing = false;
+//      recompile();
+//
+//      var resizers = $(grid).find('[ui-grid-column-resizer]');
+//
+//      expect(resizers.size()).toEqual(0);
     });
   });
 
