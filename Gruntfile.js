@@ -244,6 +244,7 @@ module.exports = function(grunt) {
           expect: false,
           inject: false,
           it: false,
+          xit:false,
           iit: false,
           module: false,
           debugger: false,

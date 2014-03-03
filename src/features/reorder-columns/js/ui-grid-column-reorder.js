@@ -25,10 +25,6 @@
 
   var module = angular.module('ui.grid.column-reorder', ['ui.grid']);
 
-//  module.constant('columnBounds', {
-//    minWidth: 35
-//  });
-
   /**
    * @ngdoc directive
    * @name ui.grid.reorderColumns.directive:uiGridColumnReorder
@@ -148,81 +144,58 @@
           this.classList.remove('ui-grid-reorder-columns-drag-over');
 
           var droppedCol = e.dataTransfer.getData('Text');
-
-          console.log("droppedCol:",droppedCol, 'parsed', JSON.parse(droppedCol), '$scope',$scope);
           droppedCol = JSON.parse(droppedCol);
-          var myIndex = $scope.index;
+          var targetOrderIndex = $scope.col.colDef.orderIndex;
+          var droppedIndex = droppedCol.colDef.orderIndex;
 
-//          $scope.$parent.grid.options.columnDefs.splice(droppedCol.index,1);
-//          var simpleColDef = {name:droppedCol.field, index:droppedCol.index};
-//          $scope.$parent.grid.options.columnDefs.splice($scope.$index,0,simpleColDef);
-
-          $scope.$parent.grid.renderedColumns.splice(droppedCol.index,1);
-          $scope.$parent.grid.renderedColumns.splice($scope.$index,0,droppedCol);
-
-          console.log("columnDefs", $scope.$parent.grid.options.columnDefs);
-
-          $scope.$parent.grid.options.columnDefs.forEach(function (colDef, index) {
-            console.log("coldDef",colDef, "index:",index);
-            colDef.index = index;
-          });
-          console.log("columnDefs after", $scope.$parent.grid.options.columnDefs);
+          //uiGridCtrl.reorderColumns(droppedCol, targetOrderIndex);
+          uiGridCtrl.grid.reorderColumns(droppedIndex, targetOrderIndex);
 
           uiGridCtrl.grid.buildColumns()
-            .then(function() {
-              // Then refresh the grid canvas, rebuilding the styles so that the scrollbar updates its size
-              uiGridCtrl.refreshCanvas(true);
-            })
-          ;
-
-          //this.appendChild(item);
-          dragElement.css({
-            background:'inherit'
+          .then(function() {
+            // Then refresh the grid canvas, rebuilding the styles so that the scrollbar updates its size
+            uiGridCtrl.refreshCanvas(true);
           });
+
+          dragElement.css({ background:'inherit' });
+
           return false;
         }, false );
-//        dragElement.on('drop',function(event){
-//          console.log("drop event",event);
-//          dragElement.removeClass('ui-grid-reorder-columns-dragging');
+
+//        function mousedown(event){
+////          // Prevent default dragging of selected content
+//          event.preventDefault();
+//          offsetX = event.offsetX;
+//          offsetY = event.offsetY;
+//
+//          var parentElement = $elm.parent();
+//          dragElement = parentElement.clone();
+//          dragElement.addClass('ui-grid-reorder-columns-dragging');
 //          dragElement.css({
-//            background:'inherit'
+//            background: parentElement.parent().parent().parent().css('background'),
+//            width:parentElement.css('width')
 //          });
-//        });
-
-        function mousedown(event){
-//          // Prevent default dragging of selected content
-          event.preventDefault();
-          offsetX = event.offsetX;
-          offsetY = event.offsetY;
-
-          var parentElement = $elm.parent();
-          dragElement = parentElement.clone();
-          dragElement.addClass('ui-grid-reorder-columns-dragging');
-          dragElement.css({
-            background: parentElement.parent().parent().parent().css('background'),
-            width:parentElement.css('width')
-          });
-          mousemove(event);
-          angular.element('body').append(dragElement);
-
-          $document.on('mousemove', mousemove);
-          $document.on('mouseup', mouseup);
-        }
-        //$elm.on('mousedown', mousedown);
-
-        function mousemove(event) {
-          dragElement.css({
-            top: (event.pageY-offsetY) + 'px',
-            left:  (event.pageX-offsetY) + 'px'
-          });
-        }
-
-        function mouseup(event) {
-          console.log("mouseup",event);
-          dragElement.remove();
-          $document.unbind('mousemove', mousemove);
-          $document.unbind('mouseup', mouseup);
-        }
+//          mousemove(event);
+//          angular.element('body').append(dragElement);
+//
+//          $document.on('mousemove', mousemove);
+//          $document.on('mouseup', mouseup);
+//        }
+//        //$elm.on('mousedown', mousedown);
+//
+//        function mousemove(event) {
+//          dragElement.css({
+//            top: (event.pageY-offsetY) + 'px',
+//            left:  (event.pageX-offsetY) + 'px'
+//          });
+//        }
+//
+//        function mouseup(event) {
+//          console.log("mouseup",event);
+//          dragElement.remove();
+//          $document.unbind('mousemove', mousemove);
+//          $document.unbind('mouseup', mouseup);
+//        }
 
         /**
          * Link stuff

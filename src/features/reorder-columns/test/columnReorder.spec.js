@@ -37,7 +37,7 @@
 //  });
 //
 //  describe('setting enableColumnResizing', function() {
-//    xit('should by default cause resizer to be attached to the header elements', function() {
+//    it('should by default cause resizer to be attached to the header elements', function() {
 //      // $scope.gridOpts.enableColumnResizing = true;
 //      // recompile();
 //
@@ -46,7 +46,7 @@
 //      expect(resizers.size()).toEqual(4);
 //    });
 //
-//    xit('should only attach a right resizer to the first column', function() {
+//    it('should only attach a right resizer to the first column', function() {
 //      // $scope.gridOpts.enableColumnResizing = true;
 //      // recompile();
 //
@@ -60,7 +60,7 @@
 //      expect(resizers.first().hasClass('right')).toBe(true);
 //    });
 //
-//    xit('should only attach a left resizer to the last column', function() {
+//    it('should only attach a left resizer to the last column', function() {
 //      // $scope.gridOpts.enableColumnResizing = true;
 //      // recompile();
 //
@@ -76,7 +76,7 @@
 //  });
 //
 //  describe('setting enableColumnResizing to false', function() {
-//    xit('should result in no resizer elements being attached to the column', function() {
+//    it('should result in no resizer elements being attached to the column', function() {
 //      $scope.gridOpts.enableColumnResizing = false;
 //      recompile();
 //
@@ -87,7 +87,7 @@
 //  });
 //
 //  describe('setting flag on colDef to false', function() {
-//    xit('should result in no resizer elements being attached to the column', function() {
+//    it('should result in no resizer elements being attached to the column', function() {
 //      $scope.gridOpts.columnDefs = [
 //        { field: 'name' },
 //        { field: 'gender', enableColumnResizing: false },
@@ -106,7 +106,7 @@
 //
 //  // NOTE: these pixel sizes might fail in other browsers, due to font differences!
 //  describe('when double-clicking a resizer', function() {
-//    xit('should resize the column to the maximum width of the rendered columns', function(done) {
+//    it('should resize the column to the maximum width of the rendered columns', function(done) {
 //      var firstResizer = $(grid).find('[ui-grid-column-resizer]').first();
 //
 //      var colWidth = $(grid).find('.col0').first().width();
@@ -124,7 +124,7 @@
 //  });
 //
 //  describe('clicking on a resizer', function() {
-//    xit('should cause the column separator overlay to be added', function() {
+//    it('should cause the column separator overlay to be added', function() {
 //      var firstResizer = $(grid).find('[ui-grid-column-resizer]').first();
 //
 //      firstResizer.trigger('mousedown');
@@ -139,7 +139,7 @@
 //    });
 //
 //    describe('and moving the mouse', function() {
-//      xit('should cause the overlay to move', function() {
+//      it('should cause the overlay to move', function() {
 //
 //      });
 //    });

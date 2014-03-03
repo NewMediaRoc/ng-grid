@@ -155,6 +155,8 @@
           self.preprocessColDef(colDef);
           var col = self.getColumn(colDef.name);
 
+          colDef.orderIndex = (typeof(colDef.orderIndex) === 'undefined') ? index : colDef.orderIndex;
+
           if (!col) {
             col = new GridColumn(colDef, index);
             self.columns.push(col);
@@ -188,6 +190,42 @@
         //field was required in 2.x.  now name is required
         if (colDef.name === undefined && colDef.field !== undefined) {
           colDef.name = colDef.field;
+        }
+      };
+
+      /**
+       * undocumented function
+       * @name reorderColumns
+       * @methodOf ui.grid.class:Grid
+       * @description Moves one column to the position of another.
+       * The 'from' column will be placed to the left the 'to' column.
+       */
+      Grid.prototype.reorderColumns = function (fromIndex, toIndex) {
+        var col, colDef,
+          columns = this.options.columnDefs,
+          numCols = columns.length;
+
+        if (fromIndex < toIndex) {
+          for ( col = 0; col < numCols; col++ ) {
+            colDef = columns[col];
+            if ( colDef.orderIndex === fromIndex ) {
+              colDef.orderIndex = toIndex - 1;
+            }
+            else if ( colDef.orderIndex < toIndex && colDef.orderIndex > fromIndex ) {
+              colDef.orderIndex--;
+            }
+          }
+        }
+        else if (fromIndex > toIndex) {
+          for ( col = 0; col < numCols; col++ ) {
+            colDef = columns[col];
+            if ( colDef.orderIndex === fromIndex ) {
+              colDef.orderIndex = toIndex;
+            }
+            else if ( colDef.orderIndex >= toIndex && colDef.orderIndex < fromIndex ) {
+              colDef.orderIndex++;
+            }
+          }
         }
       };
 
@@ -424,6 +462,9 @@
 
         // Resizing columns, off by default
         this.enableColumnResizing = false;
+
+        // Reordering columns, off by default
+        this.enableColumnReordering = false;
 
         // Columns can't be smaller than 10 pixels
         this.minimumColumnSize = 10;
