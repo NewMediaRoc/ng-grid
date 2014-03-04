@@ -150,27 +150,34 @@
         $log.debug('buildColumns');
         var self = this;
         var builderPromises = [];
+        var columnOrderDirty = false;
 
         self.options.columnDefs.forEach(function (colDef, index) {
           self.preprocessColDef(colDef);
           var col = self.getColumn(colDef.name);
 
-          colDef.orderIndex = (typeof(colDef.orderIndex) === 'undefined') ? index : colDef.orderIndex;
-
           if (!col) {
+            columnOrderDirty = true;
             col = new GridColumn(colDef, index);
             self.columns.push(col);
           }
           else {
+            columnOrderDirty = (col.orderIndex !== colDef.orderIndex) ? true : columnOrderDirty;
             col.updateColumnDef(colDef, col.index);
           }
 
           self.columnBuilders.forEach(function (builder) {
             builderPromises.push(builder.call(self, colDef, col, self.options));
           });
-
         });
 
+        //Grid.columns needs to be ordered so the rendered subset is in the correct order.
+        //Should only sort columns if order has changed
+        if(columnOrderDirty){
+          self.columns.sort(function (a, b) {
+            return a.orderIndex - b.orderIndex;
+          });
+        }
         return $q.all(builderPromises);
       };
 

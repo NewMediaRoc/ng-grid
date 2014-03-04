@@ -80,7 +80,7 @@
           throw new Error('[ui-grid-reorder-columns] uiGridCtrl is undefined!');
         }
 
-        $log.debug('ui-grid-reorder-columns link $elm:',$elm);
+        //$log.debug('ui-grid-reorder-columns link $elm:',$elm);
 
         var dragElement, dragElm, offsetX, offsetY, dragIndex;
         dragElement = $elm.parent();
@@ -115,6 +115,7 @@
 //            //width:dragElement.css('width')
 //          });
 //        });
+
         dragElm.addEventListener('dragover', function(e) {
           e.dataTransfer.dropEffect = 'move';
           // allows us to drop

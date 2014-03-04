@@ -45,6 +45,8 @@ angular.module('ui.grid')
 
     //position of column
     self.index = (typeof(index) === 'undefined') ? colDef.index : index;
+    self.orderIndex = (typeof(colDef.orderIndex) === 'undefined') ? index : colDef.orderIndex;
+
 
     if (colDef.name === undefined) {
       throw new Error('colDef.name is required for column at index ' + self.index);
